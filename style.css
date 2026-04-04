@@ -75,10 +75,14 @@ a:hover {
   top: 1rem;
 }
 
-.site-header {
+/* sticky는 site-head에 둠 — nav(딤·패널)는 header 밖 형제이므로 같은 래퍼에서 겹침·스크롤 고정 처리 */
+.site-head {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+.site-header {
   height: var(--header-h);
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(16px);
@@ -109,21 +113,54 @@ a:hover {
   color: var(--coral-deep);
 }
 
+/* 데스크톱: 헤더 줄과 같은 높이에 링크만 오른쪽 정렬(토글은 .site-header 안에 있음) */
 .nav {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
 }
 
 .nav-toggle {
   display: none;
-  padding: 0.5rem 0.9rem;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem;
   font: inherit;
-  font-weight: 600;
   color: var(--text);
   background: var(--white);
   border: 1px solid rgba(255, 107, 92, 0.25);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
+}
+
+.nav-toggle-icon {
+  display: block;
+}
+
+/* 모바일 드로어용 — 데스크톱에서는 숨김 */
+.nav-backdrop {
+  display: none;
+}
+
+/* 닫기 버튼 행: 데스크톱에서는 링크 목록에 섞이지 않게 숨김 */
+.nav-close-item {
+  display: none;
+}
+
+.nav-close {
+  display: none;
 }
 
 .nav-list {
@@ -287,6 +324,17 @@ a:hover {
   color: var(--text);
 }
 
+/* 영문 보조 제목(예: Interests) — 메인 제목과 구분 */
+.section-title-en {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
 .section-lead {
   margin: 0;
   color: var(--text-muted);
@@ -411,36 +459,110 @@ a:hover {
 }
 
 @media (max-width: 640px) {
-  .nav-toggle {
+  /* absolute·flex 오버레이 제거: fixed 딤/패널만 뷰포트 기준으로 쌓이게 함 */
+  .nav {
     display: block;
+    position: static;
+    height: 0;
+    padding: 0;
+    max-width: none;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .nav-toggle {
+    display: flex;
+    z-index: 70;
+    position: relative;
+  }
+
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(44, 40, 38, 0.42);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.28s ease, visibility 0.28s ease;
+  }
+
+  .nav.is-open .nav-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .nav-list {
-    position: absolute;
+    position: fixed;
+    top: 0;
     right: 0;
-    top: calc(var(--header-h) - 8px);
+    z-index: 60;
+    width: min(288px, 86vw);
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
     flex-direction: column;
-    gap: 0;
+    gap: 0.25rem;
     align-items: stretch;
-    min-width: 200px;
-    padding: 0.65rem;
+    /* 상단 여백을 줄여 닫기 버튼이 자연스럽게 자리잡게 함 */
+    padding: 1rem 1rem 1.5rem;
     background: var(--white);
-    border: 1px solid rgba(255, 107, 92, 0.15);
-    border-radius: var(--radius-sm);
+    border: none;
+    border-left: 1px solid rgba(255, 107, 92, 0.15);
+    border-radius: 0;
     box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
     visibility: hidden;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+    pointer-events: none;
+    transition: transform 0.28s ease, visibility 0.28s ease;
+    overflow-y: auto;
   }
 
-  .nav-list.is-open {
+  .nav.is-open .nav-list {
+    transform: translateX(0);
     visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* 닫기 버튼 행: 패널 상단 오른쪽 정렬 */
+  .nav-close-item {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 107, 92, 0.1);
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0.25rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid rgba(255, 107, 92, 0.2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: color 0.18s ease, background 0.18s ease;
+  }
+
+  .nav-close:hover {
+    color: var(--coral-deep);
+    background: var(--coral-mist);
   }
 
   .nav-list li a {
     border-radius: var(--radius-sm);
+  }
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .nav-backdrop,
+  .nav-list {
+    transition-duration: 0.01ms;
   }
 }
