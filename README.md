@@ -6,6 +6,10 @@
 
 웹 접근성과 성능을 함께 챙기며, 명확한 코드와 일관된 디자인을 지향하는 개인 포트폴리오 사이트입니다.
 
+## 배포
+
+- **라이브 사이트**: [https://my-homepage-three-gamma.vercel.app/](https://my-homepage-three-gamma.vercel.app/)
+
 ## 구성
 
 | 섹션 | 내용 |
